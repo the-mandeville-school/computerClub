@@ -27,7 +27,7 @@ cAtt = [cNam, cInt, cStr, cSpd, cDur, cEPr, cFis]
 
 # create our "table of cards" for player 1 and player 2
 
-p1Cards =  ()
+p1Cards =  deque()
 p2Cards = deque()
 pileCards = deque()
 
