@@ -3,7 +3,12 @@
 #
 # Program to create and maintain a set of Top Trump style cards
 #
+# 17/12/14  : Added CSV load file functionality
+#             Changed looping mechanism around cards to cater for a variable number of cards.
 
+
+# Import CSV controls
+import csv
 
 # Uses 'deque' objects to handle first-in last out type queues
 from collections import deque
@@ -13,37 +18,34 @@ from random import shuffle
 attVal = 1
 attDesc = 0
 gameDeck = []
-
-# Define constants for our cards
-cNam = "Name"
-cInt = "Intelligence"
-cStr = "Strength"
-cSpd = "Speed"
-cDur = "Durability"
-cEPr = "Energy Projection"
-cFis = "Fighting Skills"
-
-cAtt = [cNam, cInt, cStr, cSpd, cDur, cEPr, cFis]
+# Declare the variable 'deck' as an empty Set
+deck = []
+cardAtts = 0
+# file name of where to find the cards to play with
+filename = "cards.csv"
 
 # create our "table of cards" for player 1 and player 2
 
-p1Cards =  deque()
+p1Cards = deque()
 p2Cards = deque()
 pileCards = deque()
 
 # Create the fixed deck of all available cards for the game
-deck = [
-    ['Captain America', 3, 3, 2, 3, 1, 6],
-    ['Iron Man', 6, 6, 5, 6, 6, 4],
-    ['Loki Laufeyson', 5, 4, 7, 6, 6, 3],
-    ['Thanos', 6, 7, 7, 6, 6, 4],
-    ['The Hulk', 2, 7, 3, 7, 5, 4],
-    ['Spiderman', 4, 4, 3, 3, 1, 4],
-    ['Nick Fury', 3, 2, 2, 2, 1, 6]
-    ]
+# Open the file "filename" to read in cards
+with open(filename, 'rb') as cardFile:
+    cardRead = csv.reader(cardFile, delimiter=',', quotechar='"')
+    for row in cardRead:
+        # Append each card to the deck as it's read in
+        deck.append(row)
+        # Get maximum number of fields for Imported card file
+        if len(row) > cardAtts:
+            cardAtts = len(row)
+
+# Get attribute labels from first line of imported file, 'Deck'
+deck.reverse()
+cAtt = deck.pop()
 
 # Create a sequence representing all cards in game
-
 for i in range(len(deck)):
     gameDeck.append(i)
 
@@ -73,21 +75,21 @@ while len(p1Cards) > 0 and len(p2Cards) > 0:
     hero1NameLen = len(p1Hero[0])
     hero2NameLen = len(p2Hero[0])
 
-# List out all attributes, numbered 1 to 6 to enable selection to test against CPU
+# List out all attributes, numbered 1 to x to enable selection to test against CPU
     print "Player one: {0:>{padName}}".format(p1Hero[0], padName=hero1NameLen + 12)
     print "=" * (hero1NameLen + 24)
-    for attNum in range(1, 6 + 1):
+    for attNum in range(1, cardAtts):
         print "[{0}] {1}: {2:>{padLen}}".format(attNum, cAtt[attNum], p1Hero[attNum], padLen=hero1NameLen + 18 - len(cAtt[attNum]))
 
     print "=" * (hero1NameLen + 24)
     attChoice = -1
-    while (attChoice < 0 or attChoice > 6):
-        attChoice = int(raw_input("Choose Attribute number to compare [1-6] [0] to quit : "))
+    while (attChoice < 0 or attChoice > (cardAtts - 1)):
+        attChoice = int(raw_input("Choose Attribute number to compare [1-{0}] [0] to quit : ".format((cardAtts - 1))))
 
     print ""
     print "Player one: {0:>{padName1}}     Player two: {1:>{padName2}}".format(p1Hero[0], p2Hero[0], padName1=hero1NameLen + 12, padName2=hero2NameLen + 12)
     print "=" * (hero1NameLen + 24), "   ", "=" * (hero2NameLen + 24)
-    for attNum in range(1, 6 + 1):
+    for attNum in range(1, cardAtts):
         if attNum == attChoice:
             print "v" * (hero1NameLen + 24), "   ", "v" * (hero2NameLen + 24)
         print "{0}: {1:>{padLen1}}     {2}: {3:>{padLen2}}".format(cAtt[attNum], p1Hero[attNum], cAtt[attNum], p2Hero[attNum],
@@ -96,6 +98,9 @@ while len(p1Cards) > 0 and len(p2Cards) > 0:
             print "^" * (hero1NameLen + 24), "   ", "^" * (hero2NameLen + 24)
 
 # Determine who wins and who loses
+    print "Att Choice {0}".format(attChoice)
+    print "P1: {0}, P2 {1}".format(p1Hero[attChoice],p2Hero[attChoice])
+
     if p1Hero[attChoice] > p2Hero[attChoice]:
         print "=" * len(p1Hero[0] + " beats " + p2Hero[0])
         print "{0} beats {1}".format(p1Hero[0], p2Hero[0])
@@ -133,4 +138,4 @@ while len(p1Cards) > 0:
 print "Player 2:"
 while len(p2Cards) > 0:
     pHero = deck[p2Cards.pop()]
-    print "{0}: {1}".format(cNam[attDesc], pHero[cNam[1]])
+    print "{0}: {1}".format(cAtt[0], pHero[0])
