@@ -66,7 +66,7 @@ for heroID in gameDeck:
 # Typical Game round, starts with player 1
 attChoice = -1
 
-while len(p1Cards) > 0 and len(p2Cards) > 0 and attChoice != 0:
+while len(p1Cards) > 0 and len(p2Cards) > 0:
     p1HeroID = p1Cards.pop()
     p2HeroID = p2Cards.pop()
     p1Hero = deck[p1HeroID]
@@ -85,7 +85,10 @@ while len(p1Cards) > 0 and len(p2Cards) > 0 and attChoice != 0:
     attChoice = -1
     while (attChoice < 0 or attChoice > (cardAtts - 1)):
         attChoice = int(raw_input("Choose Attribute number to compare [1-{0}] [0] to quit : ".format((cardAtts - 1))))
-    if attChoice != 0:
+    if attChoice == 0:
+        p1Cards.clear()
+        p2Cards.clear()
+    else:
         print ""
         print "Player one: {0:>{padName1}}     Player two: {1:>{padName2}}".format(p1Hero[0], p2Hero[0], padName1=hero1NameLen + 12, padName2=hero2NameLen + 12)
         print "=" * (hero1NameLen + 24), "   ", "=" * (hero2NameLen + 24)
